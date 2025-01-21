@@ -1,7 +1,3 @@
-# RoseBotAio EN
-just some Telegram bot
-some times bot cant work 🗿
-
-# RoseBotAio EN
-Просто телеграм бот
-Иногда бот может не работать 🗿
+start code by - 22.01.2025
+procent of work bot - 0%
+deadline - xx.04.2025

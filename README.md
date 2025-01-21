@@ -1,4 +1,7 @@
-# RoseBotAio
-jsut some Telegram bot
+# RoseBotAio EN
+just some Telegram bot
+some times bot cant work 🗿
 
-some times bot cant work cause v padlu vashe
+# RoseBotAio EN
+Просто телеграм бот
+Иногда бот может не работать 🗿

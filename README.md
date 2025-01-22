@@ -34,7 +34,7 @@
 
 ## 💖 Как поддержать проект  
 
-Если вам нравится идея бота, вы можете поддержать проект, предложив свои идеи или став частью команды разработчиков. Свяжитесь с нами через Telegram: [@PluginPresetsShare](https://t.me/PluginPresetsShare). 📩  
+Если вам нравится идея бота, вы можете поддержать проект, предложив свои идеи или став частью команды разработчиков. Свяжитесь с нами через Telegram: [@PluginPresetsShareBot](https://t.me/PluginPresetsShareBot). 📩  
 
 ---
 
@@ -81,7 +81,7 @@
 
 ## 💖 How to Support the Project  
 
-If you like the idea of the bot, you can support the project by suggesting your ideas or becoming part of the development team. Contact us via Telegram: [@PluginPresetsShare](https://t.me/PluginPresetsShare). 📩  
+If you like the idea of the bot, you can support the project by suggesting your ideas or becoming part of the development team. Contact us via Telegram: [@PluginPresetsShareBot](https://t.me/PluginPresetsShareBot). 📩  
 
 ---
 

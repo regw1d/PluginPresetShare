@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пресеты | PluginPresetShare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Поиск пресетов -->
+        <section class="section">
+            <h2>🔍 Поиск пресетов</h2>
+            <div class="search-bar">
+                <input type="text" id="searchPresets" placeholder="Введите название пресета...">
+            </div>
+        </section>
+
+        <!-- Форма загрузки пресета -->
+        <section class="section">
+            <h2>📤 Загрузить пресет</h2>
+            <form id="upload-preset-form">
+                <div class="form-group">
+                    <input type="text" class="form-input" placeholder="Название пресета" required>
+                </div>
+                <div class="form-group">
+                    <textarea class="form-input" placeholder="Описание" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <input type="file" class="form-input" required>
+                </div>
+                <button class="btn btn-primary" type="submit">Загрузить</button>
+            </form>
+        </section>
+
+        <!-- Список пресетов -->
+        <section class="section">
+            <h2>🎵 Все пресеты</h2>
+            <div id="presets-list">
+                <div class="no-presets">Пока нет загруженных пресетов</div>
+            </div>
+        </section>
+
+        <!-- Топ-10 пресетов по популярности -->
+        <section class="section">
+            <h2>🏆 Топ-10 пресетов</h2>
+            <div id="top-presets-list">
+                <div class="no-presets">Пока нет данных о популярных пресетах</div>
+            </div>
+        </section>
+
+    <!-- Навигация -->
+    <div class="nav-container">
+        <nav class="nav-bar">
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-home"></i>
+                Главная
+            </a>
+            <a href="quests.html" class="nav-link">
+                <i class="fas fa-tasks"></i>
+                Квесты
+            </a>
+            <a href="presets.html" class="nav-link">
+                <i class="fas fa-music"></i>
+                Пресеты
+            </a>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

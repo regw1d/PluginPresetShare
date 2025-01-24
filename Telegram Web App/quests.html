@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Квесты | PluginPresetShare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Форма создания квеста -->
+        <section class="section">
+            <h2>🎯 Создать квест</h2>
+            <form id="create-quest-form">
+                <div class="form-group">
+                    <input type="text" class="form-input" placeholder="Название квеста" required>
+                </div>
+                <div class="form-group">
+                    <textarea class="form-input" placeholder="Описание квеста" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-input" placeholder="Награда в CP" min="1" required>
+                </div>
+                <button class="btn btn-primary" type="submit">Создать квест</button>
+            </form>
+        </section>
+
+        <!-- Список активных квестов -->
+        <section class="section">
+            <h2>🎯 Активные квесты</h2>
+            <div id="quests-list">
+                <div class="no-quests">Пока нет активных квестов</div>
+            </div>
+        </section>
+
+    <!-- Навигация -->
+    <div class="nav-container">
+        <nav class="nav-bar">
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-home"></i>
+                Главная
+            </a>
+            <a href="quests.html" class="nav-link">
+                <i class="fas fa-tasks"></i>
+                Квесты
+            </a>
+            <a href="presets.html" class="nav-link">
+                <i class="fas fa-music"></i>
+                Пресеты
+            </a>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

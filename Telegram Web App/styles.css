@@ -1,0 +1,280 @@
+:root {
+    --primary: #6366f1;
+    --secondary: #4f46e5;
+    --accent: #10b981;
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --border-color: #e2e8f0;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --radius: 12px;
+    --transition: all 0.2s ease-in-out;
+}
+
+[data-theme="dark"] {
+    --background: #1e293b;
+    --surface: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --border-color: #475569;
+}
+
+/* Добавляем стили для строк в темной теме */
+[data-theme="dark"] .preset-card,
+[data-theme="dark"] .achievement-card,
+[data-theme="dark"] .quest-card {
+    background: var(--surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .preset-card:hover,
+[data-theme="dark"] .achievement-card:hover,
+[data-theme="dark"] .quest-card:hover {
+    background: var(--background);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .preset-card h3,
+[data-theme="dark"] .achievement-card h3,
+[data-theme="dark"] .quest-card h3 {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .preset-card p,
+[data-theme="dark"] .achievement-card p,
+[data-theme="dark"] .quest-card p {
+    color: var(--text-secondary);
+}
+
+/* Остальные стили остаются без изменений */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background);
+    color: var(--text-primary);
+    line-height: 1.6;
+    padding-bottom: 80px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.balance-card {
+    background: var(--surface);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    margin: 2rem auto;
+    width: fit-content;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    box-shadow: var(--shadow-md);
+    border: 2px solid var(--primary);
+    transition: var(--transition);
+}
+
+.balance-card:hover {
+    transform: translateY(-3px);
+}
+
+.balance-icon {
+    font-size: 1.8rem;
+    color: var(--accent);
+}
+
+.balance-text {
+    text-align: center;
+}
+
+.balance-title {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+}
+
+.balance-amount {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.nav-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    padding: 1rem;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+    z-index: 1000;
+}
+
+.nav-bar {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.nav-link {
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--background);
+}
+
+.nav-link:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.nav-link i {
+    font-size: 1.2rem;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.8rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px -2px rgba(99, 102, 241, 0.3);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.search-bar {
+    margin-bottom: 1.5rem;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.search-bar input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.preset-card {
+    background: var(--surface);
+    padding: 1rem;
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.preset-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.preset-card h3 {
+    margin-bottom: 0.5rem;
+}
+
+.preset-card p {
+    color: var(--text-secondary);
+}
+
+.achievements-section {
+    margin-top: 2rem;
+}
+
+.achievement-card {
+    background: var(--surface);
+    padding: 1rem;
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.achievement-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.achievement-card h3 {
+    margin-bottom: 0.5rem;
+}
+
+.achievement-card p {
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .nav-link span {
+        display: none;
+    }
+
+    .nav-link i {
+        font-size: 1.4rem;
+    }
+
+    .balance-card {
+        margin: 1rem;
+        width: auto;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

@@ -114,7 +114,3 @@ If you like the idea of the bot, you can support the project by suggesting your 
 
 - [regw1d](https://github.com/regw1d/) — main developer  
 - [MaDeInCCCP](https://github.com/MaDeInCCCP2/) — second developer  
-
---- 
-
-Теперь в **README** добавлен раздел с установкой зависимостей, и он выглядит завершенным. 😊

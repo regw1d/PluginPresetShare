@@ -15,13 +15,13 @@
 
 [data-theme="dark"] {
     --background: #1e293b;
-    --surface: #334155;
+    --surface: #2d3748; /* Сделаем поверхность немного темнее */
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
-    --border-color: #475569;
+    --border-color: #4a5568; /* Сделаем границы немного темнее */
 }
 
-/* Добавляем стили для строк в темной теме */
+/* Остальные стили остаются без изменений */
 [data-theme="dark"] .preset-card,
 [data-theme="dark"] .achievement-card,
 [data-theme="dark"] .quest-card {
@@ -48,6 +48,22 @@
 [data-theme="dark"] .achievement-card p,
 [data-theme="dark"] .quest-card p {
     color: var(--text-secondary);
+}
+
+[data-theme="dark"] .form-input,
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="number"],
+[data-theme="dark"] textarea {
+    background-color: var(--surface);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-input::placeholder,
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.8;
 }
 
 /* Остальные стили остаются без изменений */
@@ -276,5 +292,64 @@ body {
     .btn {
         width: 100%;
         justify-content: center;
+    }
+}
+
+/* Кастомизация кнопки выбора файла */
+input[type="file"] {
+    position: relative;
+    cursor: pointer;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    background: var(--primary);
+    color: white;
+    border: 2px solid var(--secondary);
+    transition: var(--transition);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Стили для текста "Файл не выбран" */
+input[type="file"]::file-selector-button {
+    display: none; /* Скрываем стандартную кнопку */
+}
+
+/* Стили при наведении */
+input[type="file"]:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px -2px rgba(99, 102, 241, 0.3);
+}
+
+/* Стили для темной темы */
+[data-theme="dark"] input[type="file"] {
+    background: var(--surface);
+    color: var(--text-primary);
+    border-color: var(--primary);
+}
+
+[data-theme="dark"] input[type="file"]:hover {
+    background: var(--background);
+}
+
+/* Кастомизация текста после кнопки */
+input[type="file"]::after {
+    content: "Обзор";
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--accent);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    input[type="file"] {
+        width: 100%;
+        padding: 0.8rem;
     }
 }

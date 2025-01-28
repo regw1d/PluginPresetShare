@@ -72,24 +72,11 @@ function applyTheme(theme) {
 
 // Загрузка темы
 function loadTheme() {
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    // Синхронизация с темой Telegram
+    const telegramTheme = tg.colorScheme; // Получаем тему Telegram
+    const savedTheme = localStorage.getItem('theme') || telegramTheme; // Используем тему Telegram по умолчанию
     applyTheme(savedTheme); // Применяем тему
 }
-
-// Синхронизация между вкладками
-window.addEventListener('storage', (event) => {
-    if (event.key === 'userBalance') {
-        // Обновляем баланс, если он изменился в другой вкладке
-        balance = parseInt(event.newValue, 10);
-        if (balanceElement) {
-            balanceElement.textContent = `${balance} CP`;
-        }
-    }
-    if (event.key === 'theme') {
-        // Обновляем тему, если она изменилась в другой вкладке
-        applyTheme(event.newValue);
-    }
-});
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {

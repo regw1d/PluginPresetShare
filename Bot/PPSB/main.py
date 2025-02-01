@@ -1,20 +1,22 @@
-# main
+# main.py
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher
 from config import TOKEN
-from app.handlers import router 
+from app.handlers import router
 from app.quest import quest_router
 from app.contact import contact_router
 
+# Инициализация бота и диспетчера
 bot = Bot(token=TOKEN)
-
 dp = Dispatcher()
+
+# Регистрация роутеров
 dp.include_router(router)
 dp.include_router(quest_router)
 dp.include_router(contact_router)
 
-# logger
+# Логирование
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
@@ -32,7 +34,7 @@ async def main():
         logger.error(f"Error: {e}")
     finally:
         await on_shutdown()
-        
+
 async def on_shutdown():
     logger.info("Stopping bot...")
     await bot.session.close()
@@ -42,8 +44,7 @@ if __name__ == '__main__':
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        logger.info("Program was stoped by user.")
+        logger.info("Program was stopped by user.")
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
-
 # python 3.13.0 | aiogram 3.17.0 | last format day 25.01.2025 - 04:12 | PPSB - @PluginPresetsShareBot

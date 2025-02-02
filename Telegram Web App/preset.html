@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пресет | PluginPresetShare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div id="preset-details"></div>
+        <section class="section">
+            <h2>💬 Комментарии</h2>
+            <div class="comments-section">
+                <input type="text" id="commentInput" placeholder="Напишите комментарий...">
+                <button class="btn btn-primary" onclick="postComment()">Отправить</button>
+                <div id="comments-list"></div>
+            </div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const presetId = new URLSearchParams(window.location.search).get('id');
+        const preset = presets.find(p => p.id === presetId);
+
+        if (preset) {
+            document.getElementById('preset-details').innerHTML = `
+                <h1>${preset.name}</h1>
+                <p>${preset.description}</p>
+                <p>❤️ ${preset.likes}</p>
+            `;
+
+            const commentsList = document.getElementById('comments-list');
+            commentsList.innerHTML = (comments[presetId] || []).map(comment => `
+                <div class="comment">
+                    <strong>${comment.user}:</strong> ${comment.text}
+                </div>
+            `).join('');
+        }
+
+        function postComment() {
+            const commentInput = document.getElementById('commentInput');
+            if (commentInput.value.trim()) {
+                if (!comments[presetId]) comments[presetId] = [];
+                comments[presetId].push({ user: userId, text: commentInput.value.trim() });
+                localStorage.setItem('comments', JSON.stringify(comments));
+                commentInput.value = "";
+                window.location.reload();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,173 +1,296 @@
-// Инициализация Telegram Web App
 const tg = window.Telegram.WebApp;
+tg.expand();
+tg.MainButton.setText("Закрыть").onClick(() => tg.close()).show();
 
-// Показываем кнопку "Закрыть" в Telegram Web App
-tg.expand(); // Раскрываем Web App на весь экран
-tg.MainButton.show(); // Показываем основную кнопку
-tg.MainButton.setText("Закрыть"); // Устанавливаем текст кнопки
+// Инициализация данных пользователя
+const userData = tg.initDataUnsafe;
+const userId = userData?.user?.id || "guest";
+let balance = 100;
 
-// Обработчик для кнопки "Закрыть"
-tg.MainButton.onClick(() => {
-    tg.close(); // Закрываем Web App
+// Синхронизация данных с Telegram
+function syncWithTelegram() {
+    tg.CloudStorage.setItem("userBalance", balance.toString(), (err) => {
+        if (err) console.error("Ошибка синхронизации баланса:", err);
+    });
+}
+
+// Обновление баланса
+async function updateBalance(amount) {
+    balance += amount;
+    try {
+        await fetch('https://your-server.com/update-balance', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Telegram-User-ID': userId,
+            },
+            body: JSON.stringify({ balance }),
+        });
+        syncWithTelegram();
+        tg.showPopup({ title: 'Успех!', message: `Баланс: ${balance} CP`, buttons: [{ type: 'close' }] });
+    } catch (error) {
+        tg.showAlert("Ошибка синхронизации баланса");
+    }
+}
+
+// Загрузка пресетов
+document.getElementById('upload-preset-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const file = document.getElementById('presetFile').files[0];
+    if (file.size > 2 * 1024 * 1024) {
+        tg.showAlert("Файл не должен превышать 2 МБ");
+        return;
+    }
+
+    const preset = {
+        id: Date.now().toString(),
+        name: document.getElementById('presetName').value,
+        description: document.getElementById('presetDescription').value,
+        file: file.name,
+        likes: 0,
+        comments: []
+    };
+
+    presets.push(preset);
+    localStorage.setItem('presets', JSON.stringify(presets));
+    tg.showAlert("Пресет загружен!");
+    updateBalance(10);
+    window.location.href = `preset.html?id=${preset.id}`; // Переход на страницу пресета
 });
 
-// Получаем данные пользователя
-const user = tg.initDataUnsafe.user;
+// Создание квестов
+document.getElementById('create-quest-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const quest = {
+        id: Date.now().toString(),
+        name: document.getElementById('questName').value,
+        description: document.getElementById('questDescription').value,
+        reward: parseInt(document.getElementById('questReward').value, 10),
+        completed: false
+    };
 
-if (user) {
-    console.log("Данные пользователя:", user);
-    // Пример: Отображаем имя пользователя
-    const userName = user.first_name || "Пользователь";
-    document.getElementById('user-name').textContent = `Привет, ${userName}!`;
+    quests.push(quest);
+    localStorage.setItem('quests', JSON.stringify(quests));
+    tg.showAlert("Квест создан!");
+    renderQuests();
+});
+
+// Рендер квестов
+function renderQuests() {
+    const questsList = document.getElementById('quests-list');
+    questsList.innerHTML = quests.map(quest => `
+        <div class="quest-card">
+            <h3>${quest.name}</h3>
+            <p>${quest.description}</p>
+            <p>Награда: ${quest.reward} CP</p>
+            <button class="btn btn-primary" onclick="completeQuest('${quest.id}')">Завершить</button>
+        </div>
+    `).join('');
 }
 
-// Инициализация баланса (только на главной странице)
-let balance = parseInt(localStorage.getItem('userBalance')) || 100; // Начальный баланс
-const balanceElement = document.getElementById('balanceAmount');
-
-// Инициализация темы
-const themeToggle = document.createElement('button');
-themeToggle.textContent = '🌙';
-themeToggle.classList.add('btn', 'btn-primary');
-themeToggle.style.position = 'fixed';
-themeToggle.style.top = '1rem';
-themeToggle.style.right = '1rem';
-themeToggle.style.zIndex = '1000';
-document.body.appendChild(themeToggle);
-
-// Функция для обновления баланса
-function updateBalance(amount) {
-    balance += amount;
-    if (balanceElement) {
-        balanceElement.textContent = `${balance} CP`;
-    }
-    localStorage.setItem('userBalance', balance); // Сохраняем баланс
-}
-
-// Функция для загрузки баланса
-function loadBalance() {
-    const savedBalance = localStorage.getItem('userBalance');
-    if (savedBalance) {
-        balance = parseInt(savedBalance, 10);
-    }
-    if (balanceElement) {
-        balanceElement.textContent = `${balance} CP`;
+// Завершение квеста
+function completeQuest(questId) {
+    const quest = quests.find(q => q.id === questId);
+    if (quest) {
+        quest.completed = true;
+        updateBalance(quest.reward);
+        localStorage.setItem('quests', JSON.stringify(quests));
+        renderQuests();
     }
 }
 
-// Функция для смены темы
-function toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme); // Сохраняем тему
-    themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+// Рендер пресетов
+function renderPresets() {
+    const presetsList = document.getElementById('presets-list');
+    presetsList.innerHTML = presets.map(preset => `
+        <div class="preset-card" onclick="window.location.href='preset.html?id=${preset.id}'">
+            <h3>${preset.name}</h3>
+            <p>${preset.description}</p>
+            <p>❤️ ${preset.likes}</p>
+        </div>
+    `).join('');
 }
 
-// Функция для применения темы
-function applyTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-    themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
-}
-
-// Загрузка темы
-function loadTheme() {
-    // Синхронизация с темой Telegram
-    const telegramTheme = tg.colorScheme; // Получаем тему Telegram
-    const savedTheme = localStorage.getItem('theme') || telegramTheme; // Используем тему Telegram по умолчанию
-    applyTheme(savedTheme); // Применяем тему
-}
-
-// Инициализация при загрузке страницы
+// Инициализация при загрузке
 document.addEventListener('DOMContentLoaded', () => {
-    loadBalance();
-    loadTheme();
+    renderPresets();
+    renderQuests();
+});
 
-    themeToggle.addEventListener('click', toggleTheme);
+// Синхронизация темы с Telegram
+function loadTheme() {
+    const theme = tg.colorScheme;
+    document.documentElement.setAttribute('data-theme', theme);
+    tg.setHeaderColor(theme === 'dark' ? '#2d3748' : '#f8fafc');
+}
+
+// Валидация формы загрузки
+function validatePresetForm() {
+    const file = document.getElementById('presetFile').files[0];
+    if (file.size > 2 * 1024 * 1024) {
+        tg.showAlert("Файл не должен превышать 2 МБ");
+        tg.HapticFeedback.notificationOccurred('error');
+        return false;
+    }
+    return true;
+}
+
+// Отправка пресета через Telegram
+document.getElementById('upload-preset-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('file', document.getElementById('presetFile').files[0]);
+
+    try {
+        const response = await tg.sendData(JSON.stringify({
+            method: 'uploadPreset',
+            userId: userData.user.id,
+            formData,
+        }));
+        if (response.ok) {
+            tg.showAlert("Пресет загружен!");
+            tg.HapticFeedback.notificationOccurred('success');
+            updateBalance(10);
+            checkAchievements('upload');
+        }
+    } catch (error) {
+        tg.showAlert("Ошибка загрузки");
+    }
+});
+
+// Кнопка "Поделиться"
+const shareBtn = new tg.Button('Поделиться', () => {
+    tg.share({
+        title: 'Пресеты',
+        text: 'Посмотрите этот пресет!',
+        url: window.location.href,
+    });
+});
+tg.MainButton.setParams({ is_visible: true }).setText("Поделиться");
+
+// Система достижений
+const achievements = [
+    { id: 1, name: 'Новичок', description: 'Загрузите первый пресет', target: 1, progress: 0, completed: false },
+    { id: 2, name: 'Энтузиаст', description: 'Загрузите 5 пресетов', target: 5, progress: 0, completed: false },
+    { id: 3, name: 'Социальный', description: 'Оставьте 10 комментариев', target: 10, progress: 0, completed: false },
+    { id: 4, name: 'Популярный', description: 'Получите 50 лайков', target: 50, progress: 0, completed: false },
+    { id: 5, name: 'Исследователь', description: 'Прослушайте 20 пресетов', target: 20, progress: 0, completed: false },
+];
+
+function checkAchievements(type) {
+    achievements.forEach(achievement => {
+        switch (achievement.id) {
+            case 1:
+                if (type === 'upload') achievement.progress++;
+                break;
+            case 3:
+                if (type === 'comment') achievement.progress++;
+                break;
+            case 4:
+                if (type === 'like') achievement.progress++;
+                break;
+        }
+
+        if (achievement.progress >= achievement.target && !achievement.completed) {
+            achievement.completed = true;
+            tg.showAlert(`🎉 Достижение "${achievement.name}" выполнено!`);
+        }
+    });
+    updateAchievementsUI();
+}
+
+function updateAchievementsUI() {
+    const achievementsSection = document.getElementById('achievements-section');
+    if (!achievementsSection) return;
+
+    achievementsSection.innerHTML = achievements.map(achievement => `
+        <div class="achievement-card">
+            <h3>${achievement.name}</h3>
+            <p>${achievement.description}</p>
+            <div class="progress-bar">
+                <div style="width: ${(achievement.progress / achievement.target) * 100}%"></div>
+            </div>
+            <p>${achievement.completed ? '✅ Выполнено' : '❌ Не выполнено'}</p>
+        </div>
+    `).join('');
+}
+
+// Топ-пресеты
+let presets = JSON.parse(localStorage.getItem('presets')) || [];
+function updateTopPresets() {
+    const sorted = [...presets].sort((a, b) => (b.likes || 0) - (a.likes || 0));
+    const top10 = sorted.slice(0, 10);
+    renderTopPresets(top10);
+}
+
+function renderTopPresets(data) {
+    const container = document.getElementById('top-presets-list');
+    container.innerHTML = data.map(preset => `
+        <div class="preset-card" id="${preset.id}">
+            <h3>${preset.name}</h3>
+            <p>${preset.description}</p>
+            <div class="preset-meta">
+                <span>❤️ ${preset.likes || 0}</span>
+                <button class="btn btn-icon" onclick="toggleLike('${preset.id}')">
+                    <i class="fas fa-heart"></i>
+                </button>
+                <button class="btn btn-icon" onclick="showComments('${preset.id}')">
+                    <i class="fas fa-comment"></i>
+                </button>
+            </div>
+            <div class="comments-section" id="comments-${preset.id}"></div>
+        </div>
+    `).join('');
+}
+
+// Система комментариев и лайков
+function addComment(presetId, text) {
+    const preset = presets.find(p => p.id === presetId);
+    if (!preset.comments) preset.comments = [];
+    preset.comments.push({ user: userId, text, date: new Date() });
+    localStorage.setItem('presets', JSON.stringify(presets));
+    checkAchievements('comment');
+    updateTopPresets();
+}
+
+function toggleLike(presetId) {
+    const preset = presets.find(p => p.id === presetId);
+    preset.likes = (preset.likes || 0) + 1;
+    localStorage.setItem('presets', JSON.stringify(presets));
+    checkAchievements('like');
+    updateTopPresets();
+}
+
+function showComments(presetId) {
+    const preset = presets.find(p => p.id === presetId);
+    const commentsSection = document.getElementById(`comments-${presetId}`);
+    commentsSection.innerHTML = preset.comments?.map(comment => `
+        <div class="comment">
+            <strong>${comment.user}:</strong> ${comment.text}
+        </div>
+    `).join('') || "Нет комментариев.";
+}
+
+function postComment() {
+    const commentInput = document.getElementById('commentInput');
+    const presetId = document.querySelector('.preset-card').id;
+    if (commentInput.value.trim()) {
+        addComment(presetId, commentInput.value.trim());
+        commentInput.value = "";
+        showComments(presetId);
+    }
+}
+
+// Инициализация при загрузке
+document.addEventListener('DOMContentLoaded', () => {
+    loadTheme();
+    tg.BackButton.show().onClick(() => window.history.back());
+    updateTopPresets();
+    updateAchievementsUI();
 
     // Пример: Добавление CP за активность
     setTimeout(() => {
         updateBalance(10);
-        alert('+10 CP за активность!');
+        tg.showAlert('+10 CP за активность!');
     }, 60000); // Через 1 минуту
-});
-
-// Поиск пресетов
-const searchInput = document.createElement('input');
-searchInput.placeholder = 'Поиск пресетов...';
-searchInput.classList.add('form-input');
-document.querySelector('.search-bar')?.appendChild(searchInput);
-
-searchInput.addEventListener('input', (e) => {
-    const searchTerm = e.target.value.toLowerCase();
-    const presets = document.querySelectorAll('.preset-card');
-    presets.forEach(preset => {
-        const title = preset.querySelector('h3').textContent.toLowerCase();
-        if (title.includes(searchTerm)) {
-            preset.style.display = 'block';
-        } else {
-            preset.style.display = 'none';
-        }
-    });
-});
-
-// Топ-10 пресетов по популярности
-const topPresets = [
-    { name: 'Preset 1', description: 'Описание пресета 1', popularity: 100 },
-    { name: 'Preset 2', description: 'Описание пресета 2', popularity: 90 },
-    // Добавьте больше пресетов
-];
-
-const topPresetsList = document.createElement('div');
-topPresetsList.classList.add('presets-list');
-document.querySelector('.section')?.appendChild(topPresetsList);
-
-topPresets.forEach(preset => {
-    const presetCard = document.createElement('div');
-    presetCard.classList.add('preset-card');
-    presetCard.innerHTML = `
-        <h3>${preset.name}</h3>
-        <p>${preset.description}</p>
-        <p>Популярность: ${preset.popularity}</p>
-    `;
-    topPresetsList.appendChild(presetCard);
-});
-
-// Достижения (только на главной странице)
-if (document.getElementById('achievements-section')) {
-    const achievements = [
-        { name: 'Новичок', description: 'Загрузите первый пресет', completed: false },
-        { name: 'Энтузиаст', description: 'Загрузите 5 пресетов', completed: false },
-        // Добавьте больше достижений
-    ];
-
-    const achievementsSection = document.getElementById('achievements-section');
-    achievementsSection.innerHTML = ''; // Очищаем содержимое
-
-    achievements.forEach(achievement => {
-        const achievementCard = document.createElement('div');
-        achievementCard.classList.add('achievement-card');
-        achievementCard.innerHTML = `
-            <h3>${achievement.name}</h3>
-            <p>${achievement.description}</p>
-            <p>${achievement.completed ? '✅ Выполнено' : '❌ Не выполнено'}</p>
-        `;
-        achievementsSection.appendChild(achievementCard);
-    });
-}
-
-// Награда за загрузку пресетов
-document.getElementById('upload-preset-form')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    updateBalance(10);
-    alert('+10 CP за загрузку пресета!');
-});
-
-// Создание квеста
-document.getElementById('create-quest-form')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const reward = parseInt(document.querySelector('#create-quest-form input[type="number"]').value, 10);
-    if (deductBalance(reward)) {
-        alert(`Квест создан! С вашего баланса списано ${reward} CP.`);
-    }
 });

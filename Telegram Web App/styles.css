@@ -15,58 +15,12 @@
 
 [data-theme="dark"] {
     --background: #1e293b;
-    --surface: #2d3748; /* Сделаем поверхность немного темнее */
+    --surface: #2d3748;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
-    --border-color: #4a5568; /* Сделаем границы немного темнее */
+    --border-color: #4a5568;
 }
 
-/* Остальные стили остаются без изменений */
-[data-theme="dark"] .preset-card,
-[data-theme="dark"] .achievement-card,
-[data-theme="dark"] .quest-card {
-    background: var(--surface);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-}
-
-[data-theme="dark"] .preset-card:hover,
-[data-theme="dark"] .achievement-card:hover,
-[data-theme="dark"] .quest-card:hover {
-    background: var(--background);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-
-[data-theme="dark"] .preset-card h3,
-[data-theme="dark"] .achievement-card h3,
-[data-theme="dark"] .quest-card h3 {
-    color: var(--text-primary);
-}
-
-[data-theme="dark"] .preset-card p,
-[data-theme="dark"] .achievement-card p,
-[data-theme="dark"] .quest-card p {
-    color: var(--text-secondary);
-}
-
-[data-theme="dark"] .form-input,
-[data-theme="dark"] input[type="text"],
-[data-theme="dark"] input[type="number"],
-[data-theme="dark"] textarea {
-    background-color: var(--surface);
-    border-color: var(--border-color);
-    color: var(--text-primary);
-}
-
-[data-theme="dark"] .form-input::placeholder,
-[data-theme="dark"] input::placeholder,
-[data-theme="dark"] textarea::placeholder {
-    color: var(--text-secondary);
-    opacity: 0.8;
-}
-
-/* Остальные стили остаются без изменений */
 * {
     margin: 0;
     padding: 0;
@@ -87,6 +41,7 @@ body {
     padding: 1rem;
 }
 
+/* Баланс */
 .balance-card {
     background: var(--surface);
     padding: 1.5rem;
@@ -125,6 +80,7 @@ body {
     font-weight: 700;
 }
 
+/* Навигация */
 .nav-container {
     position: fixed;
     bottom: 0;
@@ -166,6 +122,7 @@ body {
     font-size: 1.2rem;
 }
 
+/* Кнопки */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -189,25 +146,42 @@ body {
     box-shadow: 0 6px 12px -2px rgba(99, 102, 241, 0.3);
 }
 
+/* Формы */
 .form-group {
     margin-bottom: 1.5rem;
 }
 
-.form-input {
+.form-input,
+input[type="text"],
+input[type="number"],
+textarea {
     width: 100%;
     padding: 1rem;
     border: 2px solid var(--border-color);
     border-radius: 8px;
     font-size: 1rem;
     transition: var(--transition);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
 }
 
-.form-input:focus {
+.form-input:focus,
+input[type="text"]:focus,
+input[type="number"]:focus,
+textarea:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
+.form-input::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.8;
+}
+
+/* Поиск */
 .search-bar {
     margin-bottom: 1.5rem;
 }
@@ -227,54 +201,79 @@ body {
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
-.preset-card {
+/* Карточки */
+.preset-card,
+.achievement-card,
+.quest-card {
     background: var(--surface);
-    padding: 1rem;
+    padding: 1.5rem;
     border-radius: var(--radius);
-    margin-bottom: 1rem;
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition);
-}
-
-.preset-card:hover {
-    transform: translateY(-2px);
+    margin-bottom: 1.5rem;
     box-shadow: var(--shadow-md);
+    transition: var(--transition);
+    border: 1px solid var(--border-color);
 }
 
-.preset-card h3 {
+.preset-card:hover,
+.achievement-card:hover,
+.quest-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.preset-card h3,
+.achievement-card h3,
+.quest-card h3 {
     margin-bottom: 0.5rem;
 }
 
-.preset-card p {
+.preset-card p,
+.achievement-card p,
+.quest-card p {
     color: var(--text-secondary);
 }
 
-.achievements-section {
-    margin-top: 2rem;
+/* Прогресс-бар */
+.progress-bar {
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0.5rem 0;
 }
 
-.achievement-card {
-    background: var(--surface);
-    padding: 1rem;
-    border-radius: var(--radius);
-    margin-bottom: 1rem;
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition);
+.progress-bar div {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.3s ease;
 }
 
-.achievement-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+/* Комментарии */
+.comments-section {
+    margin-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
 }
 
-.achievement-card h3 {
+.comment {
+    padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
     margin-bottom: 0.5rem;
 }
 
-.achievement-card p {
-    color: var(--text-secondary);
+/* Анимация лайков */
+@keyframes like {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
 }
 
+.fa-heart {
+    animation: like 0.4s ease;
+}
+
+/* Адаптивность */
 @media (max-width: 768px) {
     .nav-link span {
         display: none;
@@ -309,19 +308,16 @@ input[type="file"] {
     box-shadow: var(--shadow-sm);
 }
 
-/* Стили для текста "Файл не выбран" */
 input[type="file"]::file-selector-button {
     display: none; /* Скрываем стандартную кнопку */
 }
 
-/* Стили при наведении */
 input[type="file"]:hover {
     background: var(--secondary);
     transform: translateY(-2px);
     box-shadow: 0 6px 12px -2px rgba(99, 102, 241, 0.3);
 }
 
-/* Стили для темной темы */
 [data-theme="dark"] input[type="file"] {
     background: var(--surface);
     color: var(--text-primary);
@@ -346,7 +342,7 @@ input[type="file"]::after {
     font-size: 0.9rem;
 }
 
-/* Адаптивность */
+/* Адаптивность для файлового ввода */
 @media (max-width: 768px) {
     input[type="file"] {
         width: 100%;

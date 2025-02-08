@@ -23,12 +23,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Главная функция
 async def main():
     try:
         logger.info('= - = - = - = - = - Bot has been started! = - = - = - = - = -')
         logger.info("Starting polling...")
-        await start_check_quest_timers(bot)  # Запуск проверки таймеров квестов
+        await start_check_quest_timers(bot)
         await dp.start_polling(bot)
     except KeyboardInterrupt:
         logger.info("Stopped by user.")
@@ -37,12 +36,12 @@ async def main():
     finally:
         await on_shutdown()
 
-# Функция завершения работы бота
 async def on_shutdown():
     logger.info("Stopping bot...")
     await bot.session.close()
     logger.info("= - = - = - = - = - Bot has been stopped! = - = - = - = - = -")
 
+# start
 if __name__ == '__main__':
     try:
         asyncio.run(main())

@@ -1,32 +1,34 @@
-# main.py
+# ppsb>main
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher
 from config import TOKEN
 from app.handlers import router
-from app.quest import quest_router
-from app.contact import contact_router
+from app.quests import quest_router, start_check_quest_timers
+from app.review import review_router
+from app.presets import preset_router
 
-# Инициализация бота и диспетчера
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-# Регистрация роутеров
 dp.include_router(router)
 dp.include_router(quest_router)
-dp.include_router(contact_router)
+dp.include_router(review_router)
+dp.include_router(preset_router)
 
-# Логирование
+# logger
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
+# Главная функция
 async def main():
     try:
         logger.info('= - = - = - = - = - Bot has been started! = - = - = - = - = -')
         logger.info("Starting polling...")
+        await start_check_quest_timers(bot)  # Запуск проверки таймеров квестов
         await dp.start_polling(bot)
     except KeyboardInterrupt:
         logger.info("Stopped by user.")
@@ -35,6 +37,7 @@ async def main():
     finally:
         await on_shutdown()
 
+# Функция завершения работы бота
 async def on_shutdown():
     logger.info("Stopping bot...")
     await bot.session.close()
@@ -47,4 +50,3 @@ if __name__ == '__main__':
         logger.info("Program was stopped by user.")
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
-# python 3.13.0 | aiogram 3.17.0 | last format day 25.01.2025 - 04:12 | PPSB - @PluginPresetsShareBot

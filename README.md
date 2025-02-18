@@ -10,6 +10,7 @@ Telegram-бот для музыкантов и звукорежиссеров, �
 [![pip](https://img.shields.io/badge/pip-gray)](https://pypi.org/project/pip/)
 [![motor](https://img.shields.io/badge/motor-yellow)](https://motor.readthedocs.io/en/stable/)
 [![mongodb](https://img.shields.io/badge/mongodb-green)](https://www.mongodb.com/)
+[![logger](https://img.shields.io/badge/logger-turquoise)](https://pypi.org/project/logger/)
 
 ---
 

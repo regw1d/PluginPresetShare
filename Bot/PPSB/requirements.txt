@@ -1,5 +1,0 @@
-aiogram==3.17.0
-motor==3.7.0
-pymongo==4.11
-pip==25.0
-logger==1.4

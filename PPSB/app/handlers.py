@@ -44,20 +44,33 @@ def main_menu_keyboard() -> InlineKeyboardMarkup:
 @router.message(CommandStart())
 async def start(message: Message):
     logger.info(f"User {message.from_user.id} used /start command.")
+    logger.info(f"start: message.from_user.username: {message.from_user.username}")
+    logger.info(f"start: message.from_user.first_name: {message.from_user.first_name}")
+    logger.info(f"start: message.from_user.id: {message.from_user.id}")
+    logger.info(f"start: message.from_user.is_bot: {message.from_user.is_bot}")
+    logger.info(f"start: message.chat.type: {message.chat.type}")
+
+    if message.chat.type != 'private':
+        logger.warning("Start command used in non-private chat.")
+        await message.answer("Пожалуйста, используйте бота в приватном чате. Откройте @PluginPresetsShareBot и нажмите /start.")
+        return
+
+    user = message.from_user
     db_instance = get_db()
     if db_instance is None:
         logger.error(f"Database '{DB_NAME}' is not initialized. Cannot process /start command.")
         await message.answer(f"Ошибка: база данных '{DB_NAME}' не инициализирована. Пожалуйста, обратитесь к администратору.")
         return
     user_profile_collection = db_instance["user_profile"]
-    user_id = message.from_user.id
+    user_id = user.id
     try:
-        user = await user_profile_collection.find_one({"user_id": user_id})
-        if not user:
+        db_user = await user_profile_collection.find_one({"user_id": user_id})
+        current_username = user.username or user.first_name or f"User_{user_id}"
+        if not db_user:
             user_data = {
                 "user_id": user_id,
-                "username": message.from_user.username or message.from_user.first_name or "Без ника",
-                "first_name": message.from_user.first_name,
+                "username": current_username,
+                "first_name": user.first_name,
                 "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "quests_completed": 0,
                 "presets_uploaded": 0,
@@ -65,7 +78,14 @@ async def start(message: Message):
                 "balance": 100
             }
             await user_profile_collection.insert_one(user_data)
-            logger.info(f"Created new profile for user {user_id} with balance 100.")
+            logger.info(f"Created new profile for user {user_id} with username {current_username}")
+        else:
+            if db_user["username"] != current_username:
+                await user_profile_collection.update_one(
+                    {"user_id": user_id},
+                    {"$set": {"username": current_username}}
+                )
+                logger.info(f"Updated username for user {user_id} to {current_username}")
     except Exception as e:
         logger.error(f"Failed to process /start for user {user_id}: {e}")
         await message.answer("Ошибка при обработке команды /start.")
@@ -102,6 +122,9 @@ async def start(message: Message):
 @router.message(Command("leaderboard"))
 async def leaderboard_command(message: Message):
     logger.info(f"User {message.from_user.id} used /leaderboard command.")
+    if message.chat.type != 'private':
+        await message.answer("Пожалуйста, используйте бота в приватном чате.")
+        return
     db_instance = get_db()
     if db_instance is None:
         logger.error(f"Database '{DB_NAME}' is not initialized. Cannot process /leaderboard command.")
@@ -127,6 +150,9 @@ async def leaderboard_command(message: Message):
 @router.message(Command("rate_preset"))
 async def rate_preset_command(message: Message):
     logger.info(f"User {message.from_user.id} used /rate_preset command: {message.text}")
+    if message.chat.type != 'private':
+        await message.answer("Пожалуйста, используйте бота в приватном чате.")
+        return
     db_instance = get_db()
     if db_instance is None:
         logger.error(f"Database '{DB_NAME}' is not initialized. Cannot process /rate_preset command.")
@@ -165,46 +191,119 @@ async def rate_preset_command(message: Message):
         logger.error(f"Failed to rate preset '{preset_name}': {e}")
         await message.answer("Ошибка при оценке пресета.")
 
-# Обновленные callback-обработчики
 @router.callback_query(F.data == "create_quest")
 async def handle_create_quest_callback(callback: CallbackQuery, state: FSMContext):
     logger.info(f"User {callback.from_user.id} clicked 'Создать квест 🎮'.")
+    if callback.message.chat.type != 'private':
+        await callback.message.answer("Пожалуйста, используйте бота в приватном чате.")
+        await callback.answer()
+        return
     await start_create_quest(callback.message, state)
     await callback.answer()
 
 @router.callback_query(F.data == "profile")
 async def handle_profile_callback(callback: CallbackQuery):
     logger.info(f"User {callback.from_user.id} clicked 'Профиль 👤'.")
-    await show_profile(callback.message)
+    logger.info(f"callback.from_user.username: {callback.from_user.username}")
+    logger.info(f"callback.from_user.first_name: {callback.from_user.first_name}")
+    logger.info(f"callback.from_user.id: {callback.from_user.id}")
+    logger.info(f"callback.from_user.is_bot: {callback.from_user.is_bot}")
+    logger.info(f"callback.message.chat.type: {callback.message.chat.type}")
+
+    if callback.message.chat.type != 'private':
+        logger.warning("Profile callback used in non-private chat.")
+        await callback.message.answer("Пожалуйста, используйте команду /profile в приватном чате с ботом.")
+        await callback.answer()
+        return
+
+    user = callback.from_user
+    db_instance = get_db()
+    if db_instance is None:
+        logger.error(f"Database '{DB_NAME}' is not initialized. Cannot process profile callback.")
+        await callback.message.answer(f"Ошибка: база данных '{DB_NAME}' не инициализирована.")
+        await callback.answer()
+        return
+    user_profile_collection = db_instance["user_profile"]
+    user_id = user.id
+    try:
+        db_user = await user_profile_collection.find_one({"user_id": user_id})
+        current_username = user.username or user.first_name or f"User_{user_id}"
+        if not db_user:
+            user_data = {
+                "user_id": user_id,
+                "username": current_username,
+                "first_name": user.first_name,
+                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "quests_completed": 0,
+                "presets_uploaded": 0,
+                "reviews_written": 0,
+                "balance": 100
+            }
+            await user_profile_collection.insert_one(user_data)
+            logger.info(f"Created new profile for user {user_id} with username {current_username}")
+        else:
+            if db_user["username"] != current_username:
+                await user_profile_collection.update_one(
+                    {"user_id": user_id},
+                    {"$set": {"username": current_username}}
+                )
+                logger.info(f"Updated username for user {user_id} to {current_username}")
+    except Exception as e:
+        logger.error(f"Failed to update username for user {user_id}: {e}")
+        await callback.message.answer("Ошибка при обновлении профиля.")
+        await callback.answer()
+        return
+    # Передаём user и message отдельно в show_profile
+    await show_profile(user=user, message=callback.message)
     await callback.answer()
 
 @router.callback_query(F.data == "upload_preset")
 async def handle_upload_preset_callback(callback: CallbackQuery, state: FSMContext):
     logger.info(f"User {callback.from_user.id} clicked 'Загрузить пресет 🎧'.")
+    if callback.message.chat.type != 'private':
+        await callback.message.answer("Пожалуйста, используйте бота в приватном чате.")
+        await callback.answer()
+        return
     await start_upload_preset(callback.message, state)
     await callback.answer()
 
 @router.callback_query(F.data == "review")
 async def handle_review_callback(callback: CallbackQuery, state: FSMContext):
     logger.info(f"User {callback.from_user.id} clicked 'Оставить отзыв ✍️'.")
+    if callback.message.chat.type != 'private':
+        await callback.message.answer("Пожалуйста, используйте бота в приватном чате.")
+        await callback.answer()
+        return
     await start_review(callback.message, state)
     await callback.answer()
 
 @router.callback_query(F.data == "list_presets")
 async def handle_list_presets_callback(callback: CallbackQuery):
     logger.info(f"User {callback.from_user.id} clicked 'Скачать пресет 📥'.")
+    if callback.message.chat.type != 'private':
+        await callback.message.answer("Пожалуйста, используйте бота в приватном чате.")
+        await callback.answer()
+        return
     await list_presets(callback.message)
     await callback.answer()
 
 @router.callback_query(F.data == "quests")
 async def handle_quests_callback(callback: CallbackQuery):
     logger.info(f"User {callback.from_user.id} clicked 'Список квестов 🔍'.")
+    if callback.message.chat.type != 'private':
+        await callback.message.answer("Пожалуйста, используйте бота в приватном чате.")
+        await callback.answer()
+        return
     await show_quests_menu(callback.message)
     await callback.answer()
 
 @router.callback_query(F.data == "my_quests")
 async def handle_my_quests_callback(callback: CallbackQuery):
     logger.info(f"User {callback.from_user.id} clicked 'Мои квесты 📋'.")
+    if callback.message.chat.type != 'private':
+        await callback.message.answer("Пожалуйста, используйте бота в приватном чате.")
+        await callback.answer()
+        return
     db_instance = get_db()
     if db_instance is None:
         logger.error(f"Database '{DB_NAME}' is not initialized. Cannot process my_quests callback.")
@@ -221,12 +320,20 @@ async def handle_my_quests_callback(callback: CallbackQuery):
 @router.callback_query(F.data == "help")
 async def handle_help_callback(callback: CallbackQuery):
     logger.info(f"User {callback.from_user.id} clicked 'Помощь 💡'.")
+    if callback.message.chat.type != 'private':
+        await callback.message.answer("Пожалуйста, используйте бота в приватном чате.")
+        await callback.answer()
+        return
     await handle_help(callback.message)
     await callback.answer()
 
 @router.callback_query(F.data == "leaderboard")
 async def handle_leaderboard_callback(callback: CallbackQuery):
     logger.info(f"User {callback.from_user.id} clicked 'Лидерская доска 🏆'.")
+    if callback.message.chat.type != 'private':
+        await callback.message.answer("Пожалуйста, используйте бота в приватном чате.")
+        await callback.answer()
+        return
     db_instance = get_db()
     if db_instance is None:
         logger.error(f"Database '{DB_NAME}' is not initialized. Cannot process leaderboard callback.")
@@ -253,24 +360,40 @@ async def handle_leaderboard_callback(callback: CallbackQuery):
 @router.callback_query(F.data == "github")
 async def handle_github_callback(callback: CallbackQuery):
     logger.info(f"User {callback.from_user.id} clicked 'GitHub 🛠️'.")
+    if callback.message.chat.type != 'private':
+        await callback.message.answer("Пожалуйста, используйте бота в приватном чате.")
+        await callback.answer()
+        return
     await callback.message.answer(f"Ссылка на GitHub: {GITHUB}\n\n", reply_markup=back_to_menu_keyboard())
     await callback.answer()
 
 @router.callback_query(F.data == "donate")
 async def handle_donate_callback(callback: CallbackQuery):
     logger.info(f"User {callback.from_user.id} clicked 'Поддержать 💸'.")
+    if callback.message.chat.type != 'private':
+        await callback.message.answer("Пожалуйста, используйте бота в приватном чате.")
+        await callback.answer()
+        return
     await callback.message.answer(f"Ссылка для поддержки: {DONATE}\n\n", reply_markup=back_to_menu_keyboard())
     await callback.answer()
 
 @router.callback_query(F.data == "channel")
 async def handle_channel_callback(callback: CallbackQuery):
     logger.info(f"User {callback.from_user.id} clicked 'Канал 📣'.")
+    if callback.message.chat.type != 'private':
+        await callback.message.answer("Пожалуйста, используйте бота в приватном чате.")
+        await callback.answer()
+        return
     await callback.message.answer(f"Ссылка на канал: {CHANNEL}\n\n", reply_markup=back_to_menu_keyboard())
     await callback.answer()
 
 @router.callback_query(F.data == "back_to_menu")
 async def back_to_menu(callback: CallbackQuery):
     logger.info(f"User {callback.from_user.id} returned to main menu.")
+    if callback.message.chat.type != 'private':
+        await callback.message.answer("Пожалуйста, используйте бота в приватном чате.")
+        await callback.answer()
+        return
     chat_id = callback.message.chat.id
     text = (
         "🎵 Добро пожаловать в мир звука и творчества! 🎵\n\n"
@@ -301,22 +424,78 @@ async def back_to_menu(callback: CallbackQuery):
 
 @router.message(Command('help'))
 async def help_command(message: Message):
+    if message.chat.type != 'private':
+        await message.answer("Пожалуйста, используйте бота в приватном чате.")
+        return
     await handle_help(message)
 
 @router.message(Command('github'))
 async def github(message: Message):
     logger.info(f"User {message.from_user.id} used /github command.")
+    if message.chat.type != 'private':
+        await message.answer("Пожалуйста, используйте бота в приватном чате.")
+        return
     await message.answer(f"Ссылка на GitHub: {GITHUB}\n\n", reply_markup=back_to_menu_keyboard())
 
 @router.message(Command('donate'))
 async def donate(message: Message):
     logger.info(f"User {message.from_user.id} used /donate command.")
+    if message.chat.type != 'private':
+        await message.answer("Пожалуйста, используйте бота в приватном чате.")
+        return
     await message.answer(f"Ссылка для поддержки: {DONATE}\n\n", reply_markup=back_to_menu_keyboard())
 
 @router.message(Command('profile'))
 async def profile_command(message: Message):
     logger.info(f"User {message.from_user.id} used /profile command.")
-    await show_profile(message)
+    logger.info(f"profile: message.from_user.username: {message.from_user.username}")
+    logger.info(f"profile: message.from_user.first_name: {message.from_user.first_name}")
+    logger.info(f"profile: message.from_user.id: {message.from_user.id}")
+    logger.info(f"profile: message.from_user.is_bot: {message.from_user.is_bot}")
+    logger.info(f"profile: message.chat.type: {message.chat.type}")
+
+    if message.chat.type != 'private':
+        logger.warning("Profile command used in non-private chat.")
+        await message.answer("Пожалуйста, используйте команду /profile в приватном чате с ботом.")
+        return
+
+    user = message.from_user
+    db_instance = get_db()
+    if db_instance is None:
+        logger.error(f"Database '{DB_NAME}' is not initialized. Cannot process /profile command.")
+        await message.answer(f"Ошибка: база данных '{DB_NAME}' не инициализирована.")
+        return
+    user_profile_collection = db_instance["user_profile"]
+    user_id = user.id
+    try:
+        db_user = await user_profile_collection.find_one({"user_id": user_id})
+        current_username = user.username or user.first_name or f"User_{user_id}"
+        if not db_user:
+            user_data = {
+                "user_id": user_id,
+                "username": current_username,
+                "first_name": user.first_name,
+                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "quests_completed": 0,
+                "presets_uploaded": 0,
+                "reviews_written": 0,
+                "balance": 100
+            }
+            await user_profile_collection.insert_one(user_data)
+            logger.info(f"Created new profile for user {user_id} with username {current_username}")
+        else:
+            if db_user["username"] != current_username:
+                await user_profile_collection.update_one(
+                    {"user_id": user_id},
+                    {"$set": {"username": current_username}}
+                )
+                logger.info(f"Updated username for user {user_id} to {current_username}")
+    except Exception as e:
+        logger.error(f"Failed to update username for user {user_id}: {e}")
+        await message.answer("Ошибка при обновлении профиля.")
+        return
+    # Передаём user и message отдельно в show_profile
+    await show_profile(user=user, message=message)
 
 async def handle_help(message: Message):
     logger.info(f"User {message.from_user.id} used /help command.")

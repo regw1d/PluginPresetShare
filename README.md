@@ -5,6 +5,8 @@
 
 Telegram-бот для музыкантов и звукорежиссеров, который помогает создавать и выполнять квесты, загружать прессеты для аудиоплагинов, а также оставлять отзывы. Бот разработан для удобного взаимодействия через инлайн-кнопки, что делает его использование максимально простым и интуитивно понятным.
 
+- ### Telegram Bot [@PluginPresetsShareBot](https://t.me/PluginPresetsShareBot)
+
 [![python](https://img.shields.io/badge/python-blue)](https://www.python.org/downloads/)
 [![aiogram](https://img.shields.io/badge/aiogram-purple)](https://docs.aiogram.dev/en/v3.18.0/)
 [![pip](https://img.shields.io/badge/pip-gray)](https://pypi.org/project/pip/)

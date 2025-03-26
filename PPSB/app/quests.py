@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import logging
 from config import DB_NAME
 from database import get_db
-from app.utils import message_id_storage  # Импортируем из нового модуля
+from app.utils import message_id_storage
 
 quest_router = Router()
 
@@ -552,7 +552,7 @@ async def accept_preset(callback: CallbackQuery):
         )
         
         chat_id = callback.message.chat.id
-        text = f"Пресет для квеста <b>{quest['title']}</b> принят. Начислено {reward} коинов."
+        text = f"Пользователь @{user['username']} выполнил ваш квест <b>{quest['title']}</b> и загрузил пресет."
         if chat_id in message_id_storage:
             try:
                 await callback.message.bot.edit_message_text(
